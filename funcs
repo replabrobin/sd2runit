@@ -1,0 +1,44 @@
+#!/bin/bash
+is_package_installed(){
+	local pkg
+	for pkg in "$@"; do
+		pacman -Q ${pkg} &> /dev/null && return 0
+	done
+	return 1
+	}
+pkg_remove(){
+	local pkgs pkg opts
+	for pkg in "$@"; do
+		case ${pkg} in
+			-*) opts+=(${pkg});;
+			*) is_package_installed $pkg && pkgs+=(${pkg});;
+		esac
+	done
+	pacman -Rdd ${opts[@]} ${pkgs[@]}
+	}
+remove_systemd(){
+	local u
+	pkg_remove --nosave --noconfirm systemd libsystemd systemd-sysvcompat lib32-systemd
+	for u in \
+		systemd-journal \
+		systemd-journal-gateway \
+		systemd-timesync \
+		systemd-network \
+		systemd-bus-proxy \
+		systemd-journal-remote \
+		systemd-journal-upload \
+		systemd-resolve \
+		; do
+		id -u $u 2>/dev/null && userdel $u
+		id -g $u 2>/dev/null && groupdel $u
+	done
+	}
+installed_packages(){
+	(
+	pacman -Qn
+	pacman -Qm
+	) | sed -e's/ .*$//' | sort | uniq
+	}
+packer(){
+	~/tmp/packer/packer "$@"
+	}
