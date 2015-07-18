@@ -1,6 +1,9 @@
 #!/bin/sh
 sync
 echo 1 > /proc/sys/kernel/sysrq
-echo s > /proc/sysrq-trigger
-echo u > /proc/sysrq-trigger
-echo o > /proc/sysrq-trigger
+for k in s e i u o;do
+	echo -n "$k..."
+	echo "$k" > /proc/sysrq-trigger
+	sleep 1
+	echo 'done!'
+done
