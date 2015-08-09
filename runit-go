@@ -91,7 +91,7 @@ else
 	) > /etc/rc.conf
 fi
 
-#for thos like me that may have oblogout installed
+#for those like me that may have oblogout installed
 if [ -r /etc/oblogout.conf ]; then
 	sed -i -e'/^\s*[commands]/,${
 /^shutdown\s*=/s[^.*$[shutdown = /home/robin/bin/robin-sleep poweroff[
