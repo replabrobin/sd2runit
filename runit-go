@@ -18,10 +18,19 @@ KEYBOARD="$(localectl status | sed -n -e'/VC Keymap:/{s/^.*:\s*//;s/\s*$//;p}')"
 
 # update and get basic stuff
 pacman -Syu --noconfirm
-pacman -S --needed makepkg base-devel git jshon expac sudo --needed --noconfirm
+pacman -S --needed base-devel git jshon expac sudo --needed --noconfirm
 
 #get an aur installer
-([ ! -x ~/tmp/packer/packer ] && cd ~/tmp && hg clone https://bitbucket.org/replabrobin/packer)
+if ! is_package_installed packer-combined; then
+	(cd /tmp
+	wget https://bitbucket.org/replabrobin/packer/get/tip.tar.gz
+	tar xvf tip.tar.gz
+	cd replabrobin-packer-*
+	./packer -S packer-combined --noconfirm --noedit
+	cd ..
+	rm -rf replabrobin-packer-*
+	)
+fi
 
 #build the util-linux-nosystemd stuff
 #util-linux contains su so maybe we need to build first
