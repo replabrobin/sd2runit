@@ -39,6 +39,3 @@ installed_packages(){
 	pacman -Qm
 	) | sed -e's/ .*$//' | sort | uniq
 	}
-packer(){
-	~/tmp/packer/packer "$@"
-	}
