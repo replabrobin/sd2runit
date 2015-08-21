@@ -47,6 +47,8 @@ setup_socklog(){
 	ensure_system_user log 19 'socklog user'
 	rm -rf /var/service/socklog*
 	rm -rf /etc/sv/socklog*
+	rm -rf /var/log/socklog*
+	rm -rf /var/log/kernel
 	for x in unix klog; do 
 		[ ! -d "/etc/sv/socklog-$x" ] && socklog-conf $x nobody log
 		ln -s ../../../sv/socklog-$x /etc/runit/runsvdir/current
