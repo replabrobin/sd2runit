@@ -33,6 +33,25 @@ remove_systemd(){
 		id -g $u 2>/dev/null && groupdel $u
 	done
 	}
+ensure_system_user(){
+	local user="$1" id="$2" comment="$3"
+	if ! id -g "$user" 2>/dev/null; then
+		groupadd -g "$id" log
+	fi
+	if ! id -u "$user" 2>/dev/null; then
+		useradd -M -g "$user" -l -s /usr/bin/nologin -c "${comment}" -r -u "$id" "$user"
+	fi
+	}
+setup_socklog(){
+	ensure_system_user nobody 99 'powerless user'
+	ensure_system_user log 19 'socklog user'
+	rm -rf /var/service/socklog*
+	rm -rf /etc/sv/socklog*
+	for x in unix klog; do 
+		[ ! -d "/etc/sv/socklog-$x" ] && socklog-conf $x nobody log
+		ln -s ../../../sv/socklog-$x /etc/runit/runsvdir/current
+	done
+	}
 installed_packages(){
 	(
 	pacman -Qn

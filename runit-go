@@ -35,9 +35,14 @@ fi
 #build the util-linux-nosystemd stuff
 #util-linux contains su so maybe we need to build first
 #and then install separately
-packer -S util-linux-nosystemd \
-	--build-only --noedit --skippgpcheck --noconfirm \
-	--makepkg-log ${tmp}/util-linux-nosystemd.makepkg.log
+for pkg in \
+	networkmanager-consolekit \
+	util-linux-nosystemd \
+	;do
+	packer -S "$pkg" \
+		--build-only --noedit --skippgpcheck --noconfirm \
+		--makepkg-log ${tmp}/"$pkg".makepkg.log
+done
 
 # as it says
 remove_systemd
@@ -124,4 +129,8 @@ for x in unix klog; do
 	[ ! -d "/etc/sv/socklog-$x" ] && socklog-conf $x nobody log
 	ln -s ../../../sv/socklog-$x /etc/runit/runsvdir/current
 done
+pacman -R networkmanager --noconfirm
+packer -S networkmanager-consolekit --install-only --noconfirm --nodeps --force \
+   	--aurpkg 'networkmanager-consolekit-[0-9]*'
+packer -R ppp modemmanager rp-pppoe --noconfirm
 installed_packages >"$HERE/new-pkgs.lst"
