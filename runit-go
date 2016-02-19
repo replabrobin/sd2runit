@@ -16,8 +16,17 @@ LTZ="$(readlink /etc/localtime)"
 LTZ="${LTZ#/usr/share/zoneinfo/}"
 KEYBOARD="$(localectl status | sed -n -e'/VC Keymap:/{s/^.*:\s*//;s/\s*$//;p}')"
 
+sudo sed -i -e'/^#\[testing\]/{
+n
+a\
+[obarun]\
+SigLevel=Never\
+Server=http://www.obarun.org/src/$arch
+}' /etc/pacman.conf
+pacman -Syy
+
 # update and get basic stuff
-pacman -Syu --noconfirm
+pacman -Su --noconfirm
 pacman -S --needed base-devel git jshon expac sudo --needed --noconfirm
 
 #get an aur installer
