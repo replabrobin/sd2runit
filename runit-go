@@ -40,18 +40,7 @@ if ! is_package_installed packer-combined; then
 	rm -rf replabrobin-packer-*
 	)
 fi
-
-#build the util-linux-nosystemd stuff
-#util-linux contains su so maybe we need to build first
-#and then install separately
-for pkg in \
-	networkmanager-consolekit \
-	util-linux-nosystemd \
-	;do
-	packer -S "$pkg" \
-		--build-only --noedit --skippgpcheck --noconfirm \
-		--makepkg-log ${tmp}/"$pkg".makepkg.log
-done
+pacman -S util-linux-nosystemd
 
 # as it says
 remove_systemd
@@ -61,16 +50,11 @@ pkg_remove --noconfirm --nodeps udev dbus procps-ng \
 	syslog-ng mkinitcpio polkit upower udisks2 \
 	util-linux libutil-linux
 
-#must be done specially to avoid su problems
-packer -S util-linux-nosystemd --install-only --noconfirm --nodeps --force \
-   	--aurpkg 'util-linux-nosystemd-[0-9]*' \
-	--aurpkg 'libutil-linux-nosystemd-[0-9]*'
-
 #now our desired replacements
 for pkg in \
 	arch-runit \
 	arch-runit-services \
-	eudev \
+	eudev-obarun \
 	eudev-systemdcompat \
 	dbus-nosystemd \
 	procps-ng-nosystemd \
@@ -139,7 +123,7 @@ for x in unix klog; do
 	ln -s ../../../sv/socklog-$x /etc/runit/runsvdir/current
 done
 pacman -R networkmanager --noconfirm
-packer -S networkmanager-consolekit --install-only --noconfirm --nodeps --force \
    	--aurpkg 'networkmanager-consolekit-[0-9]*'
+pacman -S network-manager-nosystemd
 packer -R ppp modemmanager rp-pppoe --noconfirm
 installed_packages >"$HERE/new-pkgs.lst"
